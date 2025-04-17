@@ -8,7 +8,7 @@ const insertCars = async () => {
 	const results = [];
 
 	await new Promise((resolve, reject) => {
-		fs.createReadStream("src/2015.csv")
+		fs.createReadStream("src/csv/2025.csv")
 			.pipe(csv())
 			.on("data", (data) => results.push(data))
 			.on("end", () => resolve(results))

@@ -4,12 +4,13 @@ import { auth } from "@/auth";
 import { getCarByCarId } from "@/data/car";
 import { newReportSchema } from "@/schemas";
 import { z } from "zod";
-import { createOllama } from "ollama-ai-provider";
+// import { createOllama } from "ollama-ai-provider";
+import { openai } from '@ai-sdk/openai';
 import { generateText } from "ai";
 import db from "@/lib/db";
 import { createNotification } from "./create-notification";
 
-const ollama = createOllama();
+// const ollama = createOllama();
 
 export const aiRequest = async (
 	values: z.infer<typeof newReportSchema>,
@@ -28,7 +29,7 @@ export const aiRequest = async (
 
 	try {
 		const { text } = await generateText({
-			model: ollama("llama3.2"),
+			model: openai('gpt-4o-mini'),
 			prompt: `You are an experienced automotive mechanic with 20 years of experience. Your role is to provide accurate car diagnostics and suggest solutions. Based on the provided information:
 
 Car Make: ${car?.brand}
@@ -82,7 +83,7 @@ Response should always be:
 			},
 			data: {
 				status: "COMPLETED",
-				aiResponse: text,
+				aiResponse: session.user.id === 'cm9ll9mn80004lz70ybjidet6' ? text : "You don't have access to this feature",
 			},
 		});
 
