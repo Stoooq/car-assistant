@@ -83,7 +83,7 @@ Response should always be:
 			},
 			data: {
 				status: "COMPLETED",
-				aiResponse: session.user.id === 'cm9ll9mn80004lz70ybjidet6' ? text : "You don't have access to this feature",
+				aiResponse: session.user.id === 'cm9ll9mn80004lz70ybjidet6' ? text : "You don\'t have access to this feature",
 			},
 		});
 
