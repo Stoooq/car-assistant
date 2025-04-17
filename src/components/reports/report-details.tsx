@@ -127,7 +127,7 @@ export function ReportDetails({ report }: { report: Report & { car: Car } }) {
 					</Button>
 					<p className="text-sm text-muted-foreground text-center">
 						Your report will be reviewed by our automotive experts. If approved,
-						you'll receive a confirmation email with additional insights and
+						you will receive a confirmation email with additional insights and
 						recommendations.
 					</p>
 				</CardFooter>
