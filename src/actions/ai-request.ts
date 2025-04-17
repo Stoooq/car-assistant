@@ -29,7 +29,7 @@ export const aiRequest = async (
 
 	try {
 		const { text } = await generateText({
-			model: openai('gpt-4o-mini'),
+			model: openai('gpt-4o'),
 			prompt: `You are an experienced automotive mechanic with 20 years of experience. Your role is to provide accurate car diagnostics and suggest solutions. Based on the provided information:
 
 Car Make: ${car?.brand}
