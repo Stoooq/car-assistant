@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
 				},
 			],
 			mode: "payment",
-			success_url: `http://localhost:3000/dashboard?success=true`, //?request.headers.get('origin')
-			cancel_url: `http://localhost:3000/dashboard?canceled=true`,
+			success_url: `https://car-assistant-lyart.vercel.app/dashboard?success=true`, //?request.headers.get('origin')
+			cancel_url: `https://car-assistant-lyart.vercel.app/dashboard?canceled=true`,
 			metadata: {
 				credits: credits,
 			},
