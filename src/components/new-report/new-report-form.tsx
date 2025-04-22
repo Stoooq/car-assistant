@@ -85,7 +85,7 @@ export function NewReportForm({ cars, carList }: { cars: Car[], carList: CarList
 
 		startTransition(async () => {
 			try {
-				const reportResult = await createReport(values, totalCredits);
+				const reportResult = await createReport(values);
 
 				if (reportResult.error) {
 					toast({
@@ -97,7 +97,7 @@ export function NewReportForm({ cars, carList }: { cars: Car[], carList: CarList
 				}
 
 				if (reportResult.success && reportResult.newReport) {
-					aiRequest(values, reportResult.newReport.id).then((aiResult) => {
+					aiRequest(values, reportResult.newReport.id, totalCredits).then((aiResult) => {
 						if (aiResult.error) {
 							toast({
 								variant: "destructive",

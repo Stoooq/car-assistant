@@ -5,7 +5,7 @@ import db from "@/lib/db"
 import { newReportSchema } from "@/schemas"
 import { z } from "zod"
 
-export const createReport = async (values: z.infer<typeof newReportSchema>, credits: number) => {
+export const createReport = async (values: z.infer<typeof newReportSchema>) => {
     const validation = newReportSchema.safeParse(values)
     if (!validation.success) return { error: "Invalid fields" };
 
@@ -27,17 +27,6 @@ export const createReport = async (values: z.infer<typeof newReportSchema>, cred
             issueText: description,
             aiResponse: null,
         }
-    })
-
-    await db.user.update({
-        where: {
-            id: user.id,
-        },
-        data: {
-            credits: {
-                decrement: Number(credits),
-            },
-        },
     })
 
     return { success: "Report created", newReport }

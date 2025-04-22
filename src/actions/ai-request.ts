@@ -5,16 +5,18 @@ import { getCarByCarId } from "@/data/car";
 import { newReportSchema } from "@/schemas";
 import { z } from "zod";
 // import { createOllama } from "ollama-ai-provider";
-import { openai } from '@ai-sdk/openai';
+import { openai } from "@ai-sdk/openai";
 import { generateText } from "ai";
 import db from "@/lib/db";
 import { createNotification } from "./create-notification";
+import { error } from "console";
 
 // const ollama = createOllama();
 
 export const aiRequest = async (
 	values: z.infer<typeof newReportSchema>,
-	reportId: string
+	reportId: string,
+	credits: number
 ) => {
 	const validation = newReportSchema.safeParse(values);
 	if (!validation.success) return { error: "Invalid fields" };
@@ -24,13 +26,16 @@ export const aiRequest = async (
 	const session = await auth();
 	if (!session) return { error: "Not Authorized" };
 
+	const user = session.user;
+
 	const car = await getCarByCarId(carId);
 	if (!car) return { error: "Car not found" };
 
 	try {
-		const { text } = await generateText({
-			model: openai('gpt-4o'),
-			prompt: `You are an experienced automotive mechanic with 20 years of experience. Your role is to provide accurate car diagnostics and suggest solutions. Based on the provided information:
+		if (session.user.id === "cm9ll9mn80004lz70ybjidet6") {
+			const { text } = await generateText({
+				model: openai("gpt-4o"),
+				prompt: `You are an experienced automotive mechanic with 20 years of experience. Your role is to provide accurate car diagnostics and suggest solutions. Based on the provided information:
 
 Car Make: ${car?.brand}
 Model: ${car?.model}
@@ -75,25 +80,39 @@ Response should always be:
 ✓ Specific to the particular model
 ✓ Focused on practical solutions
 ✓ Including safety warnings and risks`,
-		});
+			});
 
-		await db.report.update({
-			where: {
-				id: reportId,
-			},
-			data: {
-				status: "COMPLETED",
-				aiResponse: session.user.id === 'cm9ll9mn80004lz70ybjidet6' ? text : "You don\'t have access to this feature",
-			},
-		});
+			await db.report.update({
+				where: {
+					id: reportId,
+				},
+				data: {
+					status: "COMPLETED",
+					aiResponse: text,
+				},
+			});
 
-		const notificationTitle = `Your ${car.brand} ${car.model} report was completed successfully`
+			await db.user.update({
+				where: {
+					id: user.id,
+				},
+				data: {
+					credits: {
+						decrement: Number(credits),
+					},
+				},
+			});
 
-		const notificationDescription = `Report sent: ${description}`
+			const notificationTitle = `Your ${car.brand} ${car.model} report was completed successfully`;
 
-		await createNotification(notificationTitle, notificationDescription)
+			const notificationDescription = `Report sent: ${description}`;
 
-		return { success: "AI analysis completed" };
+			await createNotification(notificationTitle, notificationDescription);
+
+			return { success: "AI analysis completed" };
+		} else {
+			return { error: "Not Authorized" };
+		}
 	} catch (error) {
 		console.error("AI Request failed:", error);
 		return { error: "Failed to generate AI response" };
